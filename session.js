@@ -4,6 +4,8 @@ import crypto from 'crypto';
 
 import RedisStore from './store.js';
 
+const memoryStorage = new Map();
+
 export default function session(redisClient) {
   return function hmm(req, res, next) {
     if (req.url === "/health" || req.session) {
@@ -15,19 +17,21 @@ export default function session(redisClient) {
 
     req.sessionID = sid;
     
-    if (!req.sessionID) {
+    if (!sid) {
       debug("no SID sent, generating session");
     //  generate();
+      req.sessionID = "proxy didnt send x-session header";
       req.sessionStore = {
         getSession: function(cb) {
-          cb({});
+          cb(memoryStorage.get("invalid_session") ?? {});
         },
         update: function(session) {
           //noop, lulz
+          memoryStorage.set("invalid_session", session);
         }
       }
-      next();
-      return;
+      //next();
+      //return;
     } else {
       req.sessionStore = new RedisStore(sid);
     }
