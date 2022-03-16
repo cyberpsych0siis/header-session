@@ -6,7 +6,7 @@ import RedisStore from './store.js';
 
 const memoryStorage = new Map();
 
-export default function session(redisClient) {
+export default function session() {
   return function hmm(req, res, next) {
     if (req.url === "/health" || req.session) {
       next();
