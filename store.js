@@ -46,7 +46,7 @@ export default class RedisStore {
     // return
     this.redisClient.get(this.sessionPrefix + this.sessionId).then((result) => {
       //   console.log(arguments);
-      callback(JSON.parse(result));
+      callback(JSON.parse(result) ?? {});
     });
   }
 
