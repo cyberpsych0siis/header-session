@@ -2,7 +2,7 @@
 
 import crypto from 'crypto';
 
-import RedisStore from './session/redis.js';
+import RedisStore from './store.js';
 
 export default function session(redisClient) {
   return function hmm(req, res, next) {
