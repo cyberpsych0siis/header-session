@@ -2,7 +2,7 @@
 
 import crypto from 'crypto';
 
-import RedisStore from './session/redis.js';
+import RedisStore from './store.js';
 
 export default function session(redisClient) {
   return function hmm(req, res, next) {
@@ -14,7 +14,7 @@ export default function session(redisClient) {
     const sid = req.headers["x-session"];
 
     req.sessionID = sid;
-    req.sessionStore = new RedisStore(redisClient.store.redisClient, sid);
+    req.sessionStore = new RedisStore(redisClient, sid);
     // req.session =
       
     req.sessionStore.getSession((data) => {
