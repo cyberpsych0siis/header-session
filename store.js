@@ -64,8 +64,12 @@ export default class RedisStore {
     });
   }
 
-  async sessionExists() {
-    return await this.redisClient.exists(this.sessionPrefix + this.sessionId);
+  sessionExists() {
+    return this.sessionId !== null && await this.redisClient.exists(this.sessionPrefix + this.sessionId) === 0;
+    return new Promise((res) => {
+      if (this.sessionId === null) res(0);
+      return this.redisClient.exists(this.sessionPrefix + this.sessionId);
+    });
   }
 
   //TODO Implement TTL Touch
