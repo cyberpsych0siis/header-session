@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 import RedisStore from './store.js';
 
-const memoryStorage = new Map();
+const memoryStorage = [];
 
 export default function session() {
   return function hmm(req, res, next) {
@@ -19,15 +19,20 @@ export default function session() {
     
     if (!sid) {
       debug("no SID sent, generating session");
+      req.sessionID = memoryStorage.length;
+      memoryStorage.push({
+        memoryStored: true
+      });
     //  generate();
-      req.sessionID = "proxy didnt send x-session header";
+//      req.sessionID = "proxy didnt send x-session header";
       req.sessionStore = {
         getSession: function(cb) {
-          cb(memoryStorage.get("invalid_session") ?? {});
+          cb(memoryStorage[req.sessionID]);
         },
         update: function(session) {
           //noop, lulz
-          memoryStorage.set("invalid_session", session);
+          //memoryStorage.set("invalid_session", session);
+          memoryStorage[req.sessionID] = session;
         }
       }
       //next();
@@ -51,7 +56,17 @@ export default function session() {
       // const currentHash = crypto.createHash('md5').update(JSON.stringify(req.session)).digest('hex');
         
       req.sessionStore.update(req.session);
+      
+      //write to cookie
+      if (req.session.memoryStored) {
+        res.setHeader("Set-Cookie", "memorySession=" + req.sessionID);
+      }
+      
       end.call(res, chunk, encoding);
     }
   }
+}
+
+function getCookieSessionId(req) {
+  
 }
