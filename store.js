@@ -1,28 +1,40 @@
 // const Store = require("./store")
 
+import { createClient } from "ioredis";
+
+export const EXPIRATION_IN_SECONDS = process.env.SESSION_TTL_SECONDS ?? 900000;
+
 export default class RedisStore {
   options = {};
 
   sessionPrefix = "sess_";
 
-  constructor(redisClient, sessionId) {
+  constructor(sessionId = null) {
     // for (let i = 0; i < Object.keys(options); i++) {}
     // this.redis = redis;
     // super();
 
     this.sessionId = sessionId;
     // this.storage = new Map();
-    this.redisClient = redisClient;
+    this.redisClient = createClient({
+      host: process.env.SESSION_REDIS_HOST ?? "redis",
+    });
   }
 
   create(callback) {
     // module.exports.createNewSessionToken = function (timeoutInSeconds) {
     if (this.sessionId === null) {
       const token = crypto.randomBytes(16).toString("hex");
-      this.redisClient.set(this.sessionPrefix + token, "{}");
+      this.redisClient.set(
+        this.sessionPrefix + token,
+        "{}",
+        "EX",
+        EXPIRATION_IN_SECONDS
+      );
       // };
       // this.redisClient;
       this.sessionId = token;
+      // this.ttl = ttl;
       callback(token);
     } else throw new Error("Already owns a session");
   }
@@ -38,7 +50,9 @@ export default class RedisStore {
     // console.log(JSON.stringify(this));
     this.redisClient.set(
       this.sessionPrefix + this.sessionId,
-      JSON.stringify(session)
+      JSON.stringify(session),
+      "EX",
+      EXPIRATION_IN_SECONDS
     );
   }
 
@@ -55,8 +69,8 @@ export default class RedisStore {
   }
 
   //TODO Implement TTL Touch
-  /*   touch(sid, session, callback) {
-    // console.log(sid, session);
-    callback(null);
-  } */
+  touch(session, callback) {
+    this.update(session);
+    // callback(null);
+  }
 }

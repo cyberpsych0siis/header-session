@@ -5,5 +5,8 @@
   "main": "session.js",
   "author": "cyberpsych0siis",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "ioredis": "^4.28.5"
+  }
 }
