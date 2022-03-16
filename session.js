@@ -6,15 +6,31 @@ import RedisStore from './store.js';
 
 export default function session(redisClient) {
   return function hmm(req, res, next) {
-    if (req.url === "/health") {
+    if (req.url === "/health" || req.session) {
       next();
       return;
     }
 
-    const sid = req.headers["x-session"];
+    const sid = req.headers["x-session"] ?? null;
 
     req.sessionID = sid;
-    req.sessionStore = new RedisStore(redisClient, sid);
+    
+    if (!req.sessionID) {
+      debug("no SID sent, generating session");
+    //  generate();
+      req.sessionStore = {
+        getSession: function(cb) {
+          cb({});
+        },
+        update: function(session) {
+          //noop, lulz
+        }
+      }
+      next();
+      return;
+    } else {
+      req.sessionStore = new RedisStore(sid);
+    }
     // req.session =
       
     req.sessionStore.getSession((data) => {
