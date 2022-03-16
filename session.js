@@ -14,7 +14,7 @@ export default function session(redisClient) {
     const sid = req.headers["x-session"];
 
     req.sessionID = sid;
-    req.sessionStore = new RedisStore(redisClient.store.redisClient, sid);
+    req.sessionStore = new RedisStore(redisClient, sid);
     // req.session =
       
     req.sessionStore.getSession((data) => {
