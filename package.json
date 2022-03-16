@@ -1,0 +1,9 @@
+{
+  "name": "header-session",
+  "version": "0.0.1",
+  "description": "extracts the x-session header and gives you a session",
+  "main": "session.js",
+  "author": "cyberpsych0siis",
+  "license": "MIT",
+  "private": true
+}
