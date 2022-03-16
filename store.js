@@ -1,10 +1,10 @@
 // const Store = require("./store")
 
-import redis from "ioredis";
+// import redis from "ioredis";
+const redis = require("ioredis");
+module.exports.EXPIRATION_IN_SECONDS = process.env.SESSION_TTL_SECONDS ?? 900000;
 
-export const EXPIRATION_IN_SECONDS = process.env.SESSION_TTL_SECONDS ?? 900000;
-
-export default class RedisStore {
+module.exports = class RedisStore {
   options = {};
 
   sessionPrefix = "sess_";
@@ -68,7 +68,12 @@ export default class RedisStore {
     //return this.sessionId !== null && await this.redisClient.exists(this.sessionPrefix + this.sessionId) === 0;
     return new Promise((res) => {
       if (this.sessionId === null) res(0);
-      return this.redisClient.exists(this.sessionPrefix + this.sessionId);
+      const exists = this.redisClient.exists(this.sessionPrefix + this.sessionId);
+      // console.log("exists: " + exists);
+      exists.then(e => {
+        res(e !== 0);
+      });
+      // return exists;
     });
   }
 

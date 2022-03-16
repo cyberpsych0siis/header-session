@@ -1,12 +1,12 @@
 "use strict";
 
-import crypto from 'crypto';
+// import crypto from 'crypto';
 
-import RedisStore from './store.js';
-
+// import RedisStore from './store.js';
+const RedisStore = require('./store.js');
 const memoryStorage = [];
 
-export default function session() {
+module.exports = function session() {
   return function hmm(req, res, next) {
     if (req.url === "/health" || req.session) {
       next();
@@ -23,6 +23,7 @@ export default function session() {
       memoryStorage.push({
         memoryStored: true
       });
+      
     //  generate();
 //      req.sessionID = "proxy didnt send x-session header";
       req.sessionStore = {
