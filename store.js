@@ -1,6 +1,6 @@
 // const Store = require("./store")
 
-import { createClient } from "ioredis";
+import redis from "ioredis";
 
 export const EXPIRATION_IN_SECONDS = process.env.SESSION_TTL_SECONDS ?? 900000;
 
@@ -16,7 +16,7 @@ export default class RedisStore {
 
     this.sessionId = sessionId;
     // this.storage = new Map();
-    this.redisClient = createClient({
+    this.redisClient = redis.createClient({
       host: process.env.SESSION_REDIS_HOST ?? "redis",
     });
   }
