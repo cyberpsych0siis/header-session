@@ -4,6 +4,8 @@
 const redis = require("ioredis");
 const crypto = require("crypto");
 
+const EXPIRATION_IN_SECONDS = process.env.SESSION_TTL_SECONDS ?? 900000;
+
 module.exports = class RedisStore {
   options = {};
 
@@ -74,6 +76,4 @@ module.exports = class RedisStore {
   }
 }
 
-
-const EXPIRATION_IN_SECONDS = process.env.SESSION_TTL_SECONDS ?? 900000;
 module.exports.EXPIRATION_IN_SECONDS = EXPIRATION_IN_SECONDS;
