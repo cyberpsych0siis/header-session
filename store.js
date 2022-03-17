@@ -58,7 +58,14 @@ module.exports = class RedisStore {
     // return
     this.redisClient.get(this.sessionPrefix + this.sessionId).then((result) => {
       //   console.log(arguments);
-      callback(JSON.parse(result) ?? {});
+
+      let s = null;
+      try {
+        s = JSON.parse(result);
+      } catch (e) {
+        s = {};
+      }
+      callback(s);
     });
   }
 
