@@ -21,13 +21,13 @@ module.exports = class RedisStore {
     });
   }
 
-  create(callback) {
+  create(data = {}, callback = null) {
     // module.exports.createNewSessionToken = function (timeoutInSeconds) {
     if (this.sessionId === null) {
       const token = crypto.randomBytes(16).toString("hex");
       this.redisClient.set(
         this.sessionPrefix + token,
-        "{}",
+        JSON.stringify(data),
         "EX",
         EXPIRATION_IN_SECONDS
       );
@@ -35,7 +35,7 @@ module.exports = class RedisStore {
       // this.redisClient;
       this.sessionId = token;
       // this.ttl = ttl;
-      callback(token);
+      if (callback) callback(token);
     } else throw new Error("Already owns a session");
   }
 
