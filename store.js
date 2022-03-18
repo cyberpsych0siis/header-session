@@ -84,18 +84,12 @@ module.exports = class RedisStore {
 
   sessionExists() {
     return new Promise((res) => {
-/*       if (this.sessionId === null) res(false);
-      this.redisClient.exists(this.sessionPrefix + this.sessionId)
-      .then(e => {
-        console.log("Exists: " + e);
-        res(Boolean(e));
-      }); */
-
       if (this.sessionId === null) res(false);
-      this.redisClient.get(this.sessionPrefix + this.sessionId, (err, data) => {
-        console.log("DATA: " + data);
-        res(Boolean(data));
-      });
+      this.redisClient.exists(this.sessionPrefix + this.sessionId)
+        .then(e => {
+          console.log("Exists: " + e);
+          res(Boolean(e));
+        });
     });
   }
 
