@@ -11,6 +11,8 @@ module.exports = class RedisStore {
 
   sessionPrefix = "sess_";
 
+  sessionId = null;
+
   constructor(sessionId = null) {
     this.sessionId = sessionId;
     // this.storage = new Map();
@@ -19,20 +21,24 @@ module.exports = class RedisStore {
     });
   }
 
-  create(data = {}, callback = null) {
+  create(data, callback = null) {
     if (this.sessionId === null) {
       const token = crypto.randomBytes(16).toString("hex");
+      console.log("Creating with data");
+      console.log(JSON.stringify(data));
+      this.sessionId = token;
       this.redisClient.set(
         this.sessionPrefix + token,
         JSON.stringify(data),
         "EX",
         EXPIRATION_IN_SECONDS
       );
-      // };
-      // this.redisClient;
-      this.sessionId = token;
-      // this.ttl = ttl;
-      if (callback) callback(token);
+
+      if (callback) {
+        callback(token);
+      } else {
+        return token;
+      }
     } else throw new Error("Already owns a session");
   }
 
@@ -44,7 +50,9 @@ module.exports = class RedisStore {
   }
 
   update(session) {
-    // console.log(JSON.stringify(this));
+    console.log("updating with data");
+    console.log(session);
+    // if (session )
     this.redisClient.set(
       this.sessionPrefix + this.sessionId,
       JSON.stringify(session),
@@ -55,31 +63,45 @@ module.exports = class RedisStore {
 
   getSession(callback) {
     // return
-    this.redisClient.get(this.sessionPrefix + this.sessionId).then((result) => {
-      //   console.log(arguments);
-
-      let s = null;
+    this.redisClient.get(this.sessionPrefix + this.sessionId, (err, result) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log("Result: " + result + " " + this.sessionId);
+        callback(Boolean(result) ? JSON.parse(result) : {});
+      }
+      
+      /*let s = null;
       try {
+        console.log("result " + result);
         s = JSON.parse(result);
       } catch (e) {
+        console.log(e);
         s = {};
-      }
-      callback(s);
+      }*/
     });
   }
 
   sessionExists() {
     return new Promise((res) => {
-      if (this.sessionId === null) res(0);
-      const exists = this.redisClient.exists(this.sessionPrefix + this.sessionId);
-      exists.then(e => {
-        res(e !== 0);
+/*       if (this.sessionId === null) res(false);
+      this.redisClient.exists(this.sessionPrefix + this.sessionId)
+      .then(e => {
+        console.log("Exists: " + e);
+        res(Boolean(e));
+      }); */
+
+      if (this.sessionId === null) res(false);
+      this.redisClient.get(this.sessionPrefix + this.sessionId, (err, data) => {
+        console.log("DATA: " + data);
+        res(Boolean(data));
       });
     });
   }
 
-  touch(session, callback) {
-    this.update(session);
+  touch() {
+    // this.update(session);
+    this.redisClient.expire(this.sessionPrefix + this.sessionId, EXPIRATION_IN_SECONDS);
   }
 }
 
