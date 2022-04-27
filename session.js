@@ -1,5 +1,6 @@
 "use strict";
 
+const AuthenticationToken = require('./models/AuthenticationToken.js');
 // import crypto from 'crypto';
 
 // import RedisStore from './store.js';
@@ -17,7 +18,7 @@ module.exports = function session() {
 
     req.sessionID = sid;
     
-    if (!sid) {
+    /*if (!sid) {
       console.log("no SID sent, generating session");
       req.sessionID = memoryStorage.length;
       memoryStorage.push({
@@ -36,13 +37,15 @@ module.exports = function session() {
       }
       //next();
       //return;
-    } else {
+    } else {*/
       req.sessionStore = new RedisStore(sid);
       // console.log(req.sessionStore);
-    }
+    //}
     // req.session =
 
     const end = res.end;
+
+    new AuthenticationToken(res, sid);
     
     res.end = (chunk, encoding) => {
       
@@ -52,9 +55,9 @@ module.exports = function session() {
       req.sessionStore.update(req.session);
       
       //write to cookie
-      if (req.session.memoryStored) {
-        res.setHeader("Set-Cookie", "memorySession=" + req.sessionID);
-      }
+      //if (req.session.memoryStored) {
+      //  res.setHeader("Set-Cookie", "memorySession=" + req.sessionID);
+      //}
       
       end.call(res, chunk, encoding);
     }
