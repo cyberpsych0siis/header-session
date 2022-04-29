@@ -45,7 +45,7 @@ module.exports = function session() {
 
     const end = res.end;
 
-    new AuthenticationToken(res, sid);
+    //new AuthenticationToken(res, sid);
     
     res.end = (chunk, encoding) => {
       
