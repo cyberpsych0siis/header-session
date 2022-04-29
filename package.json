@@ -4,7 +4,6 @@
   "description": "extracts the x-session header and gives you a session",
   "main": "session.js",
   "author": "cyberpsych0siis",
-  "type": "module",
   "license": "MIT",
   "private": true,
   "dependencies": {

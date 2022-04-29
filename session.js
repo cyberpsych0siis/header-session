@@ -1,6 +1,6 @@
-import RedisStore from './store.js';
+const RedisStore = require("./RedisStore.js");
 
-export default (req, res, next) => {
+module.exports = (req, res, next) => {
     //middleware goes here
 
     const sid = req.headers["x-session"];
