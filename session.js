@@ -25,6 +25,7 @@ module.exports = (req, res, next) => {
             next();
         });
     } else {
+        console.log("No X-Session Header present")
         next();
     }
 }
