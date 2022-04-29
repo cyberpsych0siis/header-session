@@ -1,4 +1,4 @@
-const RedisStore = require("./RedisStore.js");
+const RedisStore = require("./store.js");
 
 module.exports = (req, res, next) => {
     //middleware goes here
