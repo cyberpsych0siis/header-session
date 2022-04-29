@@ -10,7 +10,7 @@ module.exports = class AuthenticationToken {
         this.token = token;
 
         //res.setHeader("Content-Type", "application/json");
-        res.setHeader("X-Token", JSON.stringify(this));
+        //res.setHeader("X-Token", JSON.stringify(this));
         res.status(token === null ? 403 : 200).send();
     }
 
