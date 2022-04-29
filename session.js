@@ -1,77 +1,30 @@
-"use strict";
+import RedisStore from './store.js';
 
-const AuthenticationToken = require('./models/AuthenticationToken.js');
-// import crypto from 'crypto';
+export default (req, res, next) => {
+    //middleware goes here
 
-// import RedisStore from './store.js';
-const RedisStore = require('./store.js');
-const memoryStorage = [];
-
-module.exports = function session() {
-  return function hmm(req, res, next) {
-    if (req.url === "/health" || req.session) {
-      next();
-      return;
-    }
-
-    const sid = req.headers["x-session"] ?? null;
-
-    req.sessionID = sid;
+    const sid = req.headers["x-session"];
+    req.session = {};
     
-    /*if (!sid) {
-      console.log("no SID sent, generating session");
-      req.sessionID = memoryStorage.length;
-      memoryStorage.push({
-        memoryStored: true
-      });
-      
-      req.sessionStore = {
-        getSession: function(cb) {
-          cb(memoryStorage[req.sessionID]);
-        },
-        update: function(session) {
-          //noop, lulz
-          //memoryStorage.set("invalid_session", session);
-          memoryStorage[req.sessionID] = session;
+    if (sid) {
+
+        req.sessionStore = new RedisStore(sid);
+
+        const proxiedEnd = res.end;
+
+        console.log("Session Id: " + sid);
+
+        res.end = (chunk, encoding) => {
+            console.log("end of request");
+            req.sessionStore.update(req.session);
+            proxiedEnd.call(res, chunk, encoding);
         }
-      }
-      //next();
-      //return;
-    } else {*/
-      req.sessionStore = new RedisStore(sid);
-      // console.log(req.sessionStore);
-    //}
-    // req.session =
-
-    const end = res.end;
-
-    //new AuthenticationToken(res, sid);
-    
-    res.end = (chunk, encoding) => {
-      
-      // const currentHash = crypto.createHash('md5').update(JSON.stringify(req.session)).digest('hex');
-      console.log("Session in middleware");
-      console.log(req.session);
-      req.sessionStore.update(req.session);
-      
-      //write to cookie
-      //if (req.session.memoryStored) {
-      //  res.setHeader("Set-Cookie", "memorySession=" + req.sessionID);
-      //}
-      
-      end.call(res, chunk, encoding);
+        
+        req.sessionStore.getSession((data) => {
+            req.session = data;
+            next();
+        });
+    } else {
+        next();
     }
-
-    req.sessionStore.getSession((data) => {
-      console.log("Session Data: ");
-      console.log(data);
-      req.session = data;
-      next();
-      // return;
-    });
-  }
 }
-
-/*function getCookieSessionId(req) {
-  
-}*/

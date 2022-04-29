@@ -1,8 +1,12 @@
-import redis from 'ioredis';
-import crypto from 'crypto';
-export const EXPIRATION_IN_SECONDS = process.env.SESSION_TTL_SECONDS ?? 900000;
+// const Store = require("./store")
 
-export default class RedisStore {
+// import redis from "ioredis";
+const redis = require("ioredis");
+const crypto = require("crypto");
+
+const EXPIRATION_IN_SECONDS = process.env.SESSION_TTL_SECONDS ?? 900000;
+
+module.exports = class RedisStore {
   options = {};
 
   sessionPrefix = "sess_";
@@ -46,8 +50,8 @@ export default class RedisStore {
   }
 
   update(session) {
-//    console.log("updating with data");
-//    console.log(session);
+    console.log("updating with data");
+    console.log(session);
     // if (session )
     this.redisClient.set(
       this.sessionPrefix + this.sessionId,
@@ -66,6 +70,15 @@ export default class RedisStore {
         console.log("Result: " + result + " " + this.sessionId);
         callback(Boolean(result) ? JSON.parse(result) : {});
       }
+      
+      /*let s = null;
+      try {
+        console.log("result " + result);
+        s = JSON.parse(result);
+      } catch (e) {
+        console.log(e);
+        s = {};
+      }*/
     });
   }
 
@@ -85,3 +98,5 @@ export default class RedisStore {
     this.redisClient.expire(this.sessionPrefix + this.sessionId, EXPIRATION_IN_SECONDS);
   }
 }
+
+module.exports.EXPIRATION_IN_SECONDS = EXPIRATION_IN_SECONDS;
